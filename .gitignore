@@ -23,6 +23,7 @@
 *.gch
 
 # Exec
-stl
+btc
+RPN
 .nfs*
 

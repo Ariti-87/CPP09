@@ -1,9 +1,9 @@
-NAME		:= btc
+NAME		:= RPN
 
 #SOURCES_____________________________________________________________
 
-SRCS		:=	main.cpp			\
-				BitcoinExchange.cpp
+SRCS		:=	main.cpp	\
+				RPN.cpp
 
 #OBJECT______________________________________________________________
 

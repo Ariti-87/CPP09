@@ -14,21 +14,31 @@
 #define RESET "\033[0m"
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <map>
+#include <iomanip>
+#include <string>
+#include <ctime>
 
 class BitcoinExchange
 {
 	public:
-		BitcoinExchange();
+		BitcoinExchange(std::string const& filename, std::string const& input);
 		BitcoinExchange(BitcoinExchange const& src);
 		~BitcoinExchange();
 		BitcoinExchange &operator=(BitcoinExchange const& src);
 
-	private:
-		// Ajoutez  ici les membres de données
+		void printData() const;
 
+	private:
+		std::map<std::string, float>_data;
+		BitcoinExchange();
+
+		bool checkDate(std::string const& date);
+		bool loadData(std::string const& filename);
+		void checkInput(std::string const& input);
+		void calculBitcoin(std::string const& input);
 };
 
-std::ostream &operator<<(std::ostream &o, BitcoinExchange const& src);
-
 #endif
-
