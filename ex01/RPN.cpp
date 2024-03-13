@@ -50,17 +50,25 @@ void RPN::calculRPN(std::string const& input)
 			{
 				case '+':
 				{
-					if (value > INT_MAX - value2)
+					if (value2 > INT_MAX - value)
 					{
 						std::cerr << "Error: Int overflow " << std::endl;
 						return ;
 					}
 					_stack.push(value2 + value); break;
 				}
-				case '-': _stack.push(value2 - value); break;
+				case '-':
+				{
+					if (value2 < INT_MIN + value)
+					{
+						std::cerr << "Error: Int overflow " << std::endl;
+						return ;
+					}
+					_stack.push(value2 - value); break;
+				}
 				case '*':
 				{
-					if (value > INT_MAX / value2)
+					if (value2 > INT_MAX / value)
 					{
 						std::cerr << "Error: Int overflow " << std::endl;
 						return ;
