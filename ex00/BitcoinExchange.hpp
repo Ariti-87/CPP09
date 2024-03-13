@@ -18,7 +18,6 @@
 #include <sstream>
 #include <map>
 #include <iomanip>
-#include <string>
 #include <ctime>
 
 class BitcoinExchange

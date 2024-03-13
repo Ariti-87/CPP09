@@ -14,21 +14,24 @@
 #define RESET "\033[0m"
 
 #include <iostream>
+#include <stack>
+#include <climits>
+#include <cctype>
 
 class RPN
 {
 	public:
-		RPN();
+		RPN(std::string const& input);
 		RPN(RPN const& src);
 		~RPN();
 		RPN &operator=(RPN const& src);
 
 	private:
-		// Ajoutez  ici les membres de données
-
+		std::stack<int> _stack;
+		RPN();
+		bool checkInput(std::string const& input);
+		void calculRPN(std::string const& input);
 };
-
-std::ostream &operator<<(std::ostream &o, RPN const& src);
 
 #endif
 

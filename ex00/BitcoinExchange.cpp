@@ -38,7 +38,7 @@ bool BitcoinExchange::loadData(std::string const& filename)
 		std::cerr << "Error Data is not in .csv format" << std::endl;
 		return false;
 	}
-	if (!inFile.is_open())
+	if (!inFile)
 	{
 		std::cerr << "Error opening Data file" << std::endl;
 		return false;
@@ -68,6 +68,11 @@ void BitcoinExchange::calculBitcoin(std::string const& input)
 {
 	std::ifstream inputStream(input.c_str());
 	std::string line;
+	if (!inputStream)
+	{
+		std::cerr << "Error opening input file" << std::endl;
+		return ;
+	}
 	if (!std::getline(inputStream, line))
 	{
 		std::cerr << "Empty Input : " << input << std::endl;
@@ -98,15 +103,15 @@ bool BitcoinExchange::checkDate(std::string const& date)
 {
 	struct tm tm = {};
 	if (strptime(date.c_str(), "%Y-%m-%d", &tm) == NULL)
-		return false; // Format incorrect
+		return false;
+	// Correction of strptime
 	int monthlen[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	if (tm.tm_mon < 0 || tm.tm_mon > 11)
-		return false; // Mois invalide
-	// Ajustement pour les années bissextiles
+	// Adjustment for leap years
 	if (tm.tm_year % 4 == 0 && (tm.tm_year % 100 != 0 || tm.tm_year % 400 == 0) && tm.tm_mon == 1)
-		monthlen[1] = 29; // Février a 29 jours en année bissextile
-	if (tm.tm_mday < 1 || tm.tm_mday > monthlen[tm.tm_mon])
-		return false; // Jour invalide pour le mois
+		monthlen[1] = 29;
+	// Testing
+	if (tm.tm_mday > monthlen[tm.tm_mon])
+		return false;
 	return true;
 }
 
@@ -141,8 +146,6 @@ void BitcoinExchange::checkInput(std::string const& input)
 			return;
 		}
 		// std::cout << value << std::endl;
-		it = _data.find(date);
-		it2 = _data.lower_bound(date);
 		if (value < 0)
 		{
 			std::cout << "Error: not a positive number" << std::endl;
@@ -153,6 +156,8 @@ void BitcoinExchange::checkInput(std::string const& input)
 			std::cout << "Error: too large a number" << std::endl;
 			return ;
 		}
+		it = _data.find(date);
+		it2 = _data.lower_bound(date);
 		if (it != _data.end())
 		{
 			std::cout << date << " => " << value << " = " << value * it->second << std::endl;
