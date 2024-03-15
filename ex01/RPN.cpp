@@ -112,7 +112,7 @@ bool RPN::checkInput(std::string const& input)
 		{
 			if (input[i] != ' ')
 			{
-				std::cerr << "Error: invalid input format, space" << std::endl;
+				std::cerr << "Error: invalid input format, space expected" << std::endl;
 				return false;
 			}
 		}
@@ -124,7 +124,7 @@ bool RPN::checkInput(std::string const& input)
 				continue;
 			else
 			{
-				std::cerr << "Error: invalid input format, digit/operator" << std::endl;
+				std::cerr << "Error: invalid input format, digit/operator expected" << std::endl;
 				return false;
 			}
 		}
