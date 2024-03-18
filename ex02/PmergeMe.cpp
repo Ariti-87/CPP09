@@ -1,9 +1,7 @@
 #include "PmergeMe.hpp"
 
 PmergeMe::PmergeMe()
-{
-	std::cout << GREEN << "Default PmergeMe" << RESET << " has been created" << std::endl;
-}
+{}
 
 PmergeMe::PmergeMe(std::vector<int> & vec, std::list<int> & list) : _vec(vec), _list(list)
 {
@@ -17,9 +15,7 @@ PmergeMe::PmergeMe(PmergeMe const& src) : _vec(src._vec), _list(src._list)
 }
 
 PmergeMe::~PmergeMe()
-{
-	// std::cout << GREEN << "PmergeMe " << RESET << " has been destroyed" << std::endl;
-}
+{}
 
 PmergeMe & PmergeMe::operator=(PmergeMe const& src)
 {
@@ -30,6 +26,134 @@ PmergeMe & PmergeMe::operator=(PmergeMe const& src)
 	}
 	return *this;
 }
+
+/////////////////////////////////////////// VECTOR //////////////////////////////////////////////
+
+static bool comparePairsByMax(std::pair<int, int> const& a, std::pair<int, int> const& b)
+{
+	return a.second < b.second;
+}
+
+void PmergeMe::mergeInsert(std::vector<int> & vec)
+{
+	addPairs(vec);
+	std::sort(_vecPairs.begin(), _vecPairs.end(), comparePairsByMax);
+	insertMax(vec);
+	for (size_t i = 1; i < _vecPairs.size(); i++)
+		insertMin(vec, i);
+}
+
+void PmergeMe::addPairs(std::vector<int> & vec)
+{
+	if (vec.size() < 2)
+		return ;
+	if (vec.size() == 2)
+	{
+		if(vec[0] > vec[1])
+			std::swap(vec[0], vec[1]);
+		_vecPairs.push_back(std::make_pair(vec[0], vec[1]));
+		return ;
+	}
+	std::vector<int>::iterator it = vec.begin() + 2;
+	std::vector<int> left(vec.begin(), it);
+	std::vector<int> right(it, vec.end());
+	addPairs(left);
+	addPairs(right);
+}
+
+void PmergeMe::insertMax(std::vector<int> & vec)
+{
+	std::vector<int> tmp(vec);
+	std::vector<int>::iterator it = tmp.end() - 1;
+	vec.clear();
+	// vec.push_back(_vecPairs[0].first); // insert First Min
+	for (size_t i = 0; i < _vecPairs.size(); i++)
+		vec.push_back(_vecPairs[i].second);
+	if (tmp.size() % 2 == 1)
+		vec.insert(std::upper_bound(vec.begin(),vec.end(), *it), *it); // Insert last if odd list
+}
+
+void PmergeMe::insertMin(std::vector<int> & vec, size_t i)
+{
+	std::vector<int>::iterator endIt = vec.begin();
+	std::vector<int>::iterator it;
+	int index = 0;
+	while (_vecPairs[i].second != vec[index])
+	{
+		index++;
+		endIt++;
+	}
+	it = upper_bound(vec.begin(), endIt, _vecPairs[i].first);
+	vec.insert(it, _vecPairs[i].first);
+}
+
+/////////////////////////////////////////// LIST //////////////////////////////////////////////
+
+void PmergeMe::mergeInsert(std::list<int> & list)
+{
+	addPairs(list);
+	_listPairs.sort(comparePairsByMax);
+	insertMax(list);
+	for (size_t i = 1; i < _listPairs.size(); i++)
+		insertMin(list, i);
+}
+
+void PmergeMe::addPairs(std::list<int> & list)
+{
+	if (list.size() < 2)
+		return ;
+	if (list.size() == 2)
+	{
+		if (list.front() > list.back())
+			std::swap(list.front(), list.back());
+		_listPairs.push_back(std::make_pair(list.front(), list.back()));
+		return ;
+	}
+	std::list<int> left;
+	std::list<int>::iterator it = list.begin();
+	for (int i = 0; i < 2; i++, it++)
+		left.push_back(*it);
+	std::list<int> right(it, list.end());
+	addPairs(left);
+	addPairs(right);
+}
+
+void PmergeMe::insertMax(std::list<int> & list)
+{
+	std::list<int> tmp(list);
+	std::list<int>::iterator it = tmp.end();
+	list.clear();
+	if (tmp.size() % 2 == 1)
+		it--;
+	list.push_back(_listPairs.front().first); // insert First Min
+	for (std::list< std::pair<int, int> >::iterator pairIt = _listPairs.begin(); pairIt != _listPairs.end(); ++pairIt)
+		list.push_back(pairIt->second);
+	if (tmp.size() % 2 == 1)
+	{
+		std::list<int>::iterator insertPos = list.begin();
+		while (insertPos != list.end() && *insertPos < *it)
+			++insertPos;
+		list.insert(insertPos, *it); // Insert last if odd list
+	}
+}
+
+void PmergeMe::insertMin(std::list<int> & list, size_t i)
+{
+	std::list< std::pair<int, int> >::const_iterator pairIt = _listPairs.begin();
+	std::advance(pairIt, i);
+	std::list<int>::iterator endIt = list.begin();
+	std::list<int>::iterator it;
+	int index = 0;
+	while (pairIt->second != *endIt)
+	{
+		index++;
+		endIt++;
+	}
+	it = upper_bound(list.begin(), endIt, pairIt->first);
+	list.insert(it, pairIt->first);
+}
+
+/////////////////////////////////////////// LIST //////////////////////////////////////////////
 
 void PmergeMe::printBeforeAndAfter(std::vector<int> & vec)
 {
@@ -46,7 +170,7 @@ void PmergeMe::printBeforeAndAfter(std::vector<int> & vec)
 	{
 		std::cout << *it << ' ';
 	}
-	std::cout << std::endl;
+	std::cout << '\n' << std::endl;
 }
 
 void PmergeMe::sortAndClock(std::vector<int> & vec, std::list<int> & list)
@@ -55,178 +179,39 @@ void PmergeMe::sortAndClock(std::vector<int> & vec, std::list<int> & list)
 
 	t = clock();
 	mergeInsert(vec);
+	// printPairs(_vecPairs);
+	// std::cout << "container -> vector : ";
+	// printContainer(_vec);
 	t = (clock() - t) * 1000000;
 	std::cout << std::setprecision(2) << std::fixed << "Vector => Time to process a range of ";
-	std::cout << vec.size() << " : " << ((float)t) / CLOCKS_PER_SEC << " us" << std::endl;
+	std::cout << vec.size() << " : " << (static_cast<double>(t)) / CLOCKS_PER_SEC << " us" << std::endl;
 
 	t = clock();
-	// mergeInsert(list);
+	mergeInsert(list);
+	// printPairs(_listPairs);
+	// std::cout << "container -> list : ";
+	// printContainer(_list);
 	t = (clock() - t) * 1000000;
 	std::cout << "List => Time to process a range of ";
-	std::cout << list.size() << " : " << ((float)t) / CLOCKS_PER_SEC << " us" << std::endl;
+	std::cout << list.size() << " : " << (static_cast<double>(t)) / CLOCKS_PER_SEC << " us" << std::endl;
 }
 
-void PmergeMe::mergeInsert(std::vector<int> & vec)
+void PmergeMe::printPairs(std::vector< std::pair<int, int> > const& pairs)
 {
-	sortPairs(vec);
-	std::cout << "Pairs : ";
-	printContainer(_vecPairs);
+	for (size_t i = 0; i < pairs.size(); ++i)
+		std::cout << "(" << pairs[i].first << ", " << pairs[i].second << ")" << std::endl;
 }
 
-void PmergeMe::sortPairs(std::vector<int> & vec)
+void PmergeMe::printPairs(std::list< std::pair<int, int> > const& pairs)
 {
-	if (vec.size() < 2)
-	{
-		_vecPairs.push_back(vec[0]);
-		return ;
-	}
-	if (vec.size() == 2)
-	{
-		if(vec[0] > vec[1])
-			std::swap(vec[0], vec[1]);
-		_vecPairs.push_back(vec[0]);
-		_vecPairs.push_back(vec[1]);
-		return ;
-	}
-	std::vector<int>::iterator it = vec.begin() + 2;
-	std::vector<int> left(vec.begin(), it);
-	std::vector<int> right(it, vec.end());
-	sortPairs(left);
-	sortPairs(right);
+	for (std::list< std::pair<int, int> >::const_iterator it = pairs.begin(); it != pairs.end(); ++it)
+		std::cout << "(" << it->first << ", " << it->second << ")" << std::endl;
 }
 
-void PmergeMe::sortPairsByMax()
+template <typename Container>
+void PmergeMe::printContainer(Container const& container) const
 {
-	std::vector<int> tmp;
-	tmp.push_back(_vecPairs[0]);
-	tmp.push_back(_vecPairs[1]);
-	std::vector<int>::iterator it = _vecPairs.begin() + 2;
-	while (it != _vecPairs.end())
-	{
-		
-	}
-
+	for (typename Container::const_iterator it = container.begin(); it != container.end(); ++it)
+		std::cout << *it << " ";
+	std::cout << std::endl;
 }
-
-void PmergeMe::merge(std::vector<int>& vec, std::vector<int>& left, std::vector<int>& right) {
-	std::vector<int>::iterator itLeft = left.begin();
-	std::vector<int>::iterator itRight = right.begin();
-	while (itLeft != left.end() && itRight != right.end()) {
-		if (*itLeft < *itRight) {
-			vec.push_back(*itLeft++);
-		} else {
-			vec.push_back(*itRight++);
-		}
-	}
-	while (itLeft != left.end()) vec.push_back(*itLeft++);
-	while (itRight != right.end()) vec.push_back(*itRight++);
-}
-
-
-
-
-
-
-
-
-
-
-void PmergeMe::mergeInsert(std::list<int> & list)
-{
-	if (list.size() < 2)
-		return ;
-	if (list.size() == 2)
-	{
-		if (list.front() > list.back())
-			list.sort();
-		std::cout << "final : ";
-		printContainer(list);
-		return ;
-	}
-	std::list<int> left;
-	std::list<int>::iterator it = list.begin();
-	for (int i = 0; i < 2; i++, it++)
-		left.push_back(*it);
-	std::list<int> right(it, list.end());
-
-	std::cout << "left : ";
-	printContainer(left);
-	std::cout << "right : ";
-	printContainer(right);
-
-	mergeInsert(left);
-	mergeInsert(right);
-
-	list.clear();
-	merge(list, left, right);
-}
-
-void PmergeMe::merge(std::list<int>& list, std::list<int>& left, std::list<int>& right) {
-	std::list<int>::iterator itLeft = left.begin();
-	std::list<int>::iterator itRight = right.begin();
-	while (itLeft != left.end() && itRight != right.end()) {
-		if (*itLeft < *itRight) {
-			list.push_back(*itLeft++);
-		} else {
-			list.push_back(*itRight++);
-		}
-	}
-	while (itLeft != left.end()) list.push_back(*itLeft++);
-	while (itRight != right.end()) list.push_back(*itRight++);
-}
-
-
-// void PmergeMe::mergeInsert(std::vector<int> & vec)
-// {
-// 	if (vec.size() < 2)
-// 		return ;
-// 	if (vec.size() == 2)
-// 	{
-// 		if(vec[0] > vec[1])
-// 			std::swap(vec[0], vec[1]);
-// 		std::cout << "final : ";
-// 		printContainer(vec);
-// 		return ;
-// 	}
-// 	std::vector<int>::iterator paire = vec.begin() + 2;
-// 	std::vector<int> left(vec.begin(), paire);
-// 	std::vector<int> right(paire, vec.end());
-
-// 	std::cout << "left : ";
-// 	printContainer(left);
-// 	std::cout << "right : ";
-// 	printContainer(right);
-
-// 	mergeInsert(left);
-// 	mergeInsert(right);
-
-// 	vec.clear();
-// 	merge(vec, left, right);
-// }
-
-// void PmergeMe::merge(std::vector<int>& vec, std::vector<int>& left, std::vector<int>& right) {
-// 	std::vector<int>::iterator itLeft = left.begin();
-// 	std::vector<int>::iterator itRight = right.begin();
-// 	while (itLeft != left.end() && itRight != right.end()) {
-// 		if (*itLeft < *itRight) {
-// 			vec.push_back(*itLeft++);
-// 		} else {
-// 			vec.push_back(*itRight++);
-// 		}
-// 	}
-// 	while (itLeft != left.end()) vec.push_back(*itLeft++);
-// 	while (itRight != right.end()) vec.push_back(*itRight++);
-// }
-
-// const long unsigned int jacobsthal[] = {
-// 		2, 2, 6, 10, 22, 42, 86, 170, 342, 682, 1366,
-// 		2730, 5462, 10922, 21846, 43690, 87382, 174762, 349526, 699050,
-// 		1398102, 2796202, 5592406, 11184810, 22369622, 44739242, 89478486,
-// 		178956970, 357913942, 715827882, 1431655766, 2863311530, 5726623062,
-// 		11453246122, 22906492246, 45812984490, 91625968982, 183251937962,
-// 		366503875926, 733007751850, 1466015503702, 2932031007402, 5864062014806,
-// 		11728124029610, 23456248059222, 46912496118442, 93824992236886, 187649984473770,
-// 		375299968947542, 750599937895082, 1501199875790165, 3002399751580331,
-// 		6004799503160661, 12009599006321322, 24019198012642644, 48038396025285288,
-// 		96076792050570576, 192153584101141152, 384307168202282304, 768614336404564608,
-// 		1537228672809129216, 3074457345618258432, 6148914691236516864, 0};
