@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv)
 {
-	if (argc < 2)
+	if (argc < 3)
 	{
 		std::cerr << "this program works with 2 argument min" << std::endl;
 		return 1;

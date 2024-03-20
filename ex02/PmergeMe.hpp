@@ -40,32 +40,27 @@ class PmergeMe
 		std::vector< std::pair<int, int> > _vecPairs;
 		std::list<int> _list;
 		std::list< std::pair<int, int> > _listPairs;
+		std::vector<unsigned int> _jacobsthalGroup;
 
 		PmergeMe();
 		void mergeInsert(std::vector<int> & vec);
 		void addPairs(std::vector<int> & vec);
-		void insertMax(std::vector<int> & vec);
-		void insertMin(std::vector<int> & vec, size_t index);
-		// void insertMin(std::vector<int> & vec);
-		void insertJacobsthal(std::vector< std::pair<int, int> >::iterator pairsStartIter, size_t groupSize, std::vector<int> & vec);
+		void insertMax(std::vector<int> & vec, std::vector<int> & tmp);
+		void insertMin(std::vector<int> & vec, int min);
+		void insertJacobsthal(std::vector<int> & vec);
 
 		void mergeInsert(std::list<int> & list);
 		void addPairs(std::list<int> & list);
-		void insertMax(std::list<int> & list);
-		void insertMin(std::list<int> & list, size_t index);
+		void insertMax(std::list<int> & list, std::list<int> & tmp);
+		void insertMin(std::list<int> & list, int min);
+		void insertJacobsthal(std::list<int> & list);
 
 		void printBeforeAndAfter(std::vector<int> & vec);
 		void sortAndClock(std::vector<int> & vec, std::list<int> & list);
-};
 
-// template <typename Container>
-// void PmergeMe::printContainer(Container const& container) const
-// {
-// 	std::cout << "container : ";
-// 	for (typename Container::const_iterator it = container.begin(); it != container.end(); ++it)
-// 		std::cout << *it << " ";
-// 	std::cout << std::endl;
-// }
+		void jacobsthal();
+		int jacobsthalSequence(int n);
+};
 
 #endif
 
