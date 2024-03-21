@@ -160,6 +160,7 @@ void BitcoinExchange::checkInput(std::string const& input)
 		it2 = _data.lower_bound(date);
 		if (it != _data.end())
 		{
+			std::cout << std::setprecision(2) << std::fixed;
 			std::cout << date << " => " << value << " = " << value * it->second << std::endl;
 			return;
 		}
@@ -168,6 +169,7 @@ void BitcoinExchange::checkInput(std::string const& input)
 			std::cout << "First date, Data not available" << std::endl;
 			return;
 		}
+		std::cout << std::setprecision(2) << std::fixed;
 		std::cout << date << " => " << value << " = " << value * (--it2)->second << std::endl;
 }
 

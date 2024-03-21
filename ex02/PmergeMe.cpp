@@ -43,8 +43,8 @@ void PmergeMe::mergeInsert(std::vector<int> & vec)
 	std::vector<int> tmp(vec);
 	vec.clear();
 	vec.push_back(_vecPairs[0].first); // insert First Min
-	insertMax(vec, tmp);
-	insertJacobsthal(vec);
+	insertMax(vec);
+	insertJacobsthalMin(vec, tmp);
 }
 
 void PmergeMe::addPairs(std::vector<int> & vec)
@@ -65,20 +65,19 @@ void PmergeMe::addPairs(std::vector<int> & vec)
 	addPairs(right);
 }
 
-void PmergeMe::insertMax(std::vector<int> & vec, std::vector<int> & tmp)
+void PmergeMe::insertMax(std::vector<int> & vec)
 {
-	std::vector<int>::iterator it = tmp.end() - 1;
 	for (size_t i = 0; i < _vecPairs.size(); i++)
 		vec.push_back(_vecPairs[i].second);
-	if (tmp.size() % 2 == 1)
-		vec.insert(std::upper_bound(vec.begin(),vec.end(), *it), *it); // Insert last if odd list
 }
 
-void PmergeMe::insertJacobsthal(std::vector<int> & vec)
+void PmergeMe::insertJacobsthalMin(std::vector<int> & vec, std::vector<int> & tmp)
 {
 	std::vector<int> tmpMin;
 	for (size_t i = 1; i < _vecPairs.size(); i++)
 		tmpMin.push_back(_vecPairs[i].first);
+	if (tmp.size() % 2 == 1) // if if odd list
+		tmpMin.push_back(tmp[tmp.size() - 1]);
 	std::vector< std::vector<int> >minGroups;
 	minGroups.push_back(std::vector<int>());
 	unsigned int groupIndex = 0;
@@ -112,16 +111,23 @@ void PmergeMe::insertJacobsthal(std::vector<int> & vec)
 
 void PmergeMe::insertMin(std::vector<int> & vec, int min)
 {
+	std::vector< std::pair<int, int> >::const_iterator pairIt = _vecPairs.begin();
 	std::vector<int>::iterator endIt;
 	std::vector<int>::iterator it;
-	int max;
-	for (int i = 0; _vecPairs[i].first != min; i++)
-	{
-		if (_vecPairs[i].first == min)
-			max = _vecPairs[i].second;
+	int max = -1;
+	for (; pairIt != _vecPairs.end(); ++pairIt) {
+		if (pairIt->first == min) {
+			max = pairIt->second;
+			break;
+		}
 	}
-	endIt = find(vec.begin(), vec.end(), max);
-	it = upper_bound(vec.begin(), endIt, min);
+	if (max == -1) // if if odd list
+		it = upper_bound(vec.begin(), vec.end(), min);
+	else
+	{
+		endIt = find(vec.begin(), vec.end(), max);
+		it = upper_bound(vec.begin(), endIt, min);
+	}
 	vec.insert(it, min);
 }
 
@@ -139,8 +145,8 @@ void PmergeMe::mergeInsert(std::list<int> & list)
 	std::list<int> tmp(list);
 	list.clear();
 	list.push_back(_listPairs.front().first); // insert First Min
-	insertMax(list, tmp);
-	insertJacobsthal(list);
+	insertMax(list);
+	insertJacobsthalMin(list, tmp);
 }
 
 void PmergeMe::addPairs(std::list<int> & list)
@@ -163,31 +169,25 @@ void PmergeMe::addPairs(std::list<int> & list)
 	addPairs(right);
 }
 
-void PmergeMe::insertMax(std::list<int> & list, std::list<int> & tmp)
+void PmergeMe::insertMax(std::list<int> & list)
 {
-	std::list<int>::iterator it = tmp.end();
-	if (tmp.size() % 2 == 1)
-		it--;
 	for (std::list< std::pair<int, int> >::iterator pairIt = _listPairs.begin(); pairIt != _listPairs.end(); ++pairIt)
 		list.push_back(pairIt->second);
-	if (tmp.size() % 2 == 1)
-	{
-		std::list<int>::iterator insertPos = list.begin();
-		while (insertPos != list.end() && *insertPos < *it)
-			++insertPos;
-		list.insert(insertPos, *it); // Insert last if odd list
-	}
 }
 
-void PmergeMe::insertJacobsthal(std::list<int> & list)
+void PmergeMe::insertJacobsthalMin(std::list<int> & list, std::list<int> & tmp)
 {
 	std::list<int> tmpMin;
+	std::list<int>::iterator lastElement = tmp.end();
+	lastElement--;
 	for (std::list< std::pair<int, int> >::iterator it = _listPairs.begin(); it != _listPairs.end(); ++it)
 	{
 		if (it == _listPairs.begin())
 			it++;
 		tmpMin.push_back(it->first);
 	}
+	if (tmp.size() % 2 == 1) // if if odd list
+		tmpMin.push_back(*lastElement);
 	std::list< std::list<int> >minGroups;
 	minGroups.push_back(std::list<int>());
 	unsigned int groupIndex = 0;
@@ -205,7 +205,6 @@ void PmergeMe::insertJacobsthal(std::list<int> & list)
 		minGroups.back().push_back(*it);
 		groupSize++;
 	}
-
 	for (std::list< std::list<int> >::iterator itGroup = minGroups.begin(); itGroup != minGroups.end(); ++itGroup)
 	{
 		for (std::list<int>::reverse_iterator it = itGroup->rbegin(); it != itGroup->rend(); ++it)
@@ -217,17 +216,22 @@ void PmergeMe::insertJacobsthal(std::list<int> & list)
 void PmergeMe::insertMin(std::list<int> & list, int min)
 {
 	std::list< std::pair<int, int> >::const_iterator pairIt = _listPairs.begin();
-	std::list<int>::iterator endIt;
+	std::list<int>::iterator endIt = list.end();
 	std::list<int>::iterator it;
-	int max;
-	while (pairIt->first != min)
-	{
-		pairIt++;
-		if (pairIt->first == min)
+	int max = -1;
+	for (; pairIt != _listPairs.end(); ++pairIt) {
+		if (pairIt->first == min) {
 			max = pairIt->second;
+			break;
+		}
 	}
-	endIt = find(list.begin(), list.end(), max);
-	it = upper_bound(list.begin(), endIt, min);
+	if (max == -1) // if if odd list
+		it = upper_bound(list.begin(), list.end(), min);
+	else
+	{
+		endIt = find(list.begin(), list.end(), max);
+		it = upper_bound(list.begin(), endIt, min);
+	}
 	list.insert(it, min);
 }
 
@@ -265,8 +269,8 @@ void PmergeMe::sortAndClock(std::vector<int> & vec, std::list<int> & list)
 	t = clock();
 	mergeInsert(list);
 	// printPairs(_listPairs);
-	std::cout << "list: ";
-	printContainer(_list);
+	// std::cout << "list: ";
+	// printContainer(_list);
 	t = (clock() - t) * 1000000;
 	std::cout << "List => Time to process a range of ";
 	std::cout << list.size() << " : " << (static_cast<double>(t)) / CLOCKS_PER_SEC << " us" << std::endl;

@@ -45,15 +45,15 @@ class PmergeMe
 		PmergeMe();
 		void mergeInsert(std::vector<int> & vec);
 		void addPairs(std::vector<int> & vec);
-		void insertMax(std::vector<int> & vec, std::vector<int> & tmp);
+		void insertMax(std::vector<int> & vec/* , std::vector<int> & tmp */);
 		void insertMin(std::vector<int> & vec, int min);
-		void insertJacobsthal(std::vector<int> & vec);
+		void insertJacobsthalMin(std::vector<int> & vec, std::vector<int> & tmp);
 
 		void mergeInsert(std::list<int> & list);
 		void addPairs(std::list<int> & list);
-		void insertMax(std::list<int> & list, std::list<int> & tmp);
+		void insertMax(std::list<int> & list/* , std::list<int> & tmp */);
 		void insertMin(std::list<int> & list, int min);
-		void insertJacobsthal(std::list<int> & list);
+		void insertJacobsthalMin(std::list<int> & list, std::list<int> & tmp);
 
 		void printBeforeAndAfter(std::vector<int> & vec);
 		void sortAndClock(std::vector<int> & vec, std::list<int> & list);

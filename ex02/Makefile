@@ -14,7 +14,6 @@ DEPS		:= $(OBJS:.o=.d)
 
 CXX			:= c++
 CXXFLAGS	:= -Wall -Wextra -Werror -std=c++98 -g3 -MMD -MP
-RM			:= rm -f
 MAKEFLAGS	+= --no-print-directory
 DIR_DUP		= mkdir -p $(@D)
 
