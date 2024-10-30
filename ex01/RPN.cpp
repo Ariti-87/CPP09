@@ -50,7 +50,7 @@ void RPN::calculRPN(std::string const& input)
 			{
 				case '+':
 				{
-					if (value2 > INT_MAX - value)
+					if (value > INT_MAX - value2)
 					{
 						std::cerr << "Error: Int overflow " << std::endl;
 						return ;

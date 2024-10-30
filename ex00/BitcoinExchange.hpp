@@ -30,8 +30,8 @@ class BitcoinExchange
 
 		void printData() const;
 
-	private:
 		std::map<std::string, float>_data;
+	private:
 		BitcoinExchange();
 
 		bool checkDate(std::string const& date);
